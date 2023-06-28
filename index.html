@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="index.js"></script>
+    <title>Javascript Blackjack</title>
+</head>
+<body onload="startGame()">
+    <h1>Blackjack</h1>
+    <!-- Area at top of screen to keep track of chips -->
+    <!-- Area for dealers cards to appear -->
+    <p id = "dealerCards-el">Dealers Cards:</p>
+    <!-- Area for players cards to appear -->
+    <p id = "playerCards-el">Your cards:</p>
+    <!-- Buttons for hit stand split ect -->
+    <div id="playerActions">
+        <button id="hitButton" onclick="hit()">Hit</button>
+        <button id="doubleDownButton" onclick="doubleDown()">Double Down</button>
+        <button id="splitButton" onclick="splitCards()">Split</button>
+        <button id="standButton" onclick="stand()">Stand</button>
+    </div>
+</body>
+</html>
