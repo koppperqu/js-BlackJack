@@ -1,38 +1,70 @@
 let dealerCards = []
-let playerCards = []
-let dealersCardsEl
-let playersCardsEl
+let playersCards = []
+let dealersCardsEl = document.getElementById("dealerCards-el")
+let playersCardsEl = document.getElementById("playerCards-el")
+let hitButton = document.getElementById("hitButton")
+let doubleDownButton = document.getElementById("doubleDownButton")
+let splitButton = document.getElementById("splitButton")
+let standButton = document.getElementById("standButton")
+let isFirstCards
 
 function startGame(){
-    dealersCardsEl = document.getElementById("dealerCards-el")
-    playersCardsEl = document.getElementById("playerCards-el")
-
-    playerCards.push(dealCard())
-    playerCards.push(dealCard())
-
+    isFirstCards = true
+    playersCards=[]
+    dealerCards=[]
+    playersCards.push(dealCard())
+    playersCards.push(dealCard())
     dealerCards.push(dealCard())
-
-    renderPlayerCards()
+    
     renderDealerCards()
+    renderPlayerCards()
     renderCorrectActionsToPlayer()
 }
 
 
 //Need to check what cards player has to present correct buttons grey out/disable buttons not needed
-
-function renderCorrectActionsToPlayer(){
-
+function countCards(cards){
+    total=0
+    for(let i = 0; i<cards.length; i++){
+        total+=cards[i]
+    }
+    return total
 }
 
-function renderPlayerCards(){
-    for (let i = 0; i < playerCards.length; i++){
-        playersCardsEl.textContent += playerCards[i] + "  "
+function renderCorrectActionsToPlayer(){
+    playersTotal = countCards(playersCards)
+    //Look at players cards it blackjack do nothing player won
+    if (playersTotal===21){
+        alert("BLACKJACK")
+    }
+    //If player has cards less than totaling less than 21 show hit and stand buttons
+    if (playersTotal<21){
+        hitButton.hidden = false
+        standButton.hidden = false
+    }
+    //If player has 2 of same card show split button
+    if ()
+    //If player was dealt their first 2 cards and it is a 9 10 or 11 show double down button otherwise disable it
+    if ([9,10,11].includes(playersTotal) && isFirstCards){
+        alert(playersTotal)
+        doubleDownButton.hidden = false
+        isFirstCards=false
+    }else {
+        doubleDownButton.hidden = true
     }
 }
 
 function renderDealerCards(){
+    dealersCardsEl.textContent = "Dealers Cards:"
     for (let i = 0; i < dealerCards.length; i++){
         dealersCardsEl.textContent += dealerCards[i] + "  "
+    }
+}
+
+function renderPlayerCards(){
+    playersCardsEl.textContent = "Your cards:"
+    for (let i = 0; i < playersCards.length; i++){
+        playersCardsEl.textContent += playersCards[i] + "  "
     }
 }
 
@@ -45,7 +77,7 @@ function dealCard(){
 
 // Hit: Ask for another card. You can ask for a hit until you decide to stand or else bust
 function hit(){
-    playerCards.push(dealCard())
+    playersCards.push(dealCard())
     renderPlayerCards()
     renderCorrectActionsToPlayer()
 }
