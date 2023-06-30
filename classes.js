@@ -56,7 +56,11 @@ class Hand {
       const BLACKJACK = 21
       let total=0
       for(let i = 0; i<this.cards.length; i++){
+        if ([12,13,14].includes(this.cards[i])){
+          total+=10
+        }else{
           total+=this.cards[i]
+        }
       }
       if (total>BLACKJACK && this.cards.includes(11)){
         //Change the ace from 11 into a 1 to prevent busting
@@ -71,8 +75,9 @@ class Hand {
       return newSuit
     }
     #dealCard(){
+      let cards=[2,3,4,5,6,7,8,9,10,11,12,13,14]
       let min = Math.ceil(2);
-      let max = Math.floor(11);
+      let max = Math.floor(14);
       let card = Math.floor(Math.random() * (max - min + 1) + min);
       return card
   }
