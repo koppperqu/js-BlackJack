@@ -1,154 +1,147 @@
-let dealerCards = []
-let playersCards = []
 let dealersCardsEl = document.getElementById("dealerCards-el")
 let playersCardsEl = document.getElementById("playerCards-el")
 let hitButton = document.getElementById("hitButton")
 let doubleDownButton = document.getElementById("doubleDownButton")
 let splitButton = document.getElementById("splitButton")
 let standButton = document.getElementById("standButton")
-let isFirstCards
-let numberOfSplitCards = 0
-let hasSelectedStand
+const BLACKJACK = 21
+let player
+let dealer
 
-function startGame(){
-    numberOfSplitCards = 0
-    isFirstCards = true
-    playersCards=[]
-    dealerCards=[]
-    playersCards.push(dealCard())
-    playersCards.push(dealCard())
-    dealerCards.push(dealCard())
-    
+function startGame() {
+    player = new Player()
+    dealer = new Player()
+    let dealersCurrentHand = dealer.currentHand
+    dealer.hands[dealersCurrentHand].cards.pop()
+    dealer.hands[dealersCurrentHand].cardSuits.pop()
     renderDealerCards()
     renderPlayerCards()
-    renderCorrectActionsToPlayer()    
-    isFirstCards=false
+    renderCorrectActionsToPlayer()
 }
 
-function splitHandLogic(){
-
-}
-
-
-//Need to check what cards player has to present correct buttons grey out/disable buttons not needed
-function countCards(cards){
-    total=0
-    for(let i = 0; i<cards.length; i++){
-        total+=cards[i]
+function renderCorrectActionsToPlayer() {
+    if(player.playerIsDone){
+        return
     }
-    return total
-}
-
-function renderCorrectActionsToPlayer(){
-    playersTotal = countCards(playersCards)
+    let currentHand = player.currentHand
+    let playersTotal = player.hands[currentHand].getCardTotal()
     //Look at players cards it blackjack do nothing player won
-    if (playersTotal===21){
+    if (playersTotal === 21) {
         dealerPlays()
     }
     //If player has cards less than totaling less than 21 show hit and stand buttons
-    if (playersTotal<21 && !hasSelectedStand){
+    if (playersTotal < 21) {
         hitButton.hidden = false
         standButton.hidden = false
     }
     //If player has 2 of same card show split button
-    if (isFirstCards && areCardsTheSame(playersCards)){
-        splitButton.hidden=false
-    }else{
-        splitButton.hidden=true
+    if (areCardsTheSame(player.hands[currentHand].cards) && player.hands[currentHand].cards.length === 2) {
+        splitButton.hidden = false
+    } else {
+        splitButton.hidden = true
     }
-
     //If player was dealt their first 2 cards and it is a 9 10 or 11 show double down button otherwise disable it
-    if ([9,10,11].includes(playersTotal) && isFirstCards){
-        alert(playersTotal)
+    const CARD_TOTALS_TO_DOUBLEDOWN_ON = [9, 10, 11]
+    if (CARD_TOTALS_TO_DOUBLEDOWN_ON.includes(playersTotal) && player.hands[currentHand].originalTwoCards) {
         doubleDownButton.hidden = false
-    }else {
+    } else {
         doubleDownButton.hidden = true
     }
 }
-function areCardsTheSame(cards){
-    if (cards[0] === cards [1]){
+
+function renderDealerCards() {
+    dealersCardsEl.textContent = "Dealers Cards: "
+    for (let i = 0; i < dealer.hands[0].cards.length; i++) {
+        dealersCardsEl.textContent += dealer.hands[0].cards[i] + "  "
+    }
+}
+
+function renderPlayerCards() {
+    playersCardsEl.textContent = "Your cards: "
+    for (let i = 0; i < player.hands.length; i++) {
+        playersCardsEl.textContent += "Hand " + (i + 1) + " - "
+        for (let j = 0; j < player.hands[i].cards.length; j++) {
+            playersCardsEl.textContent += player.hands[i].cards[j] + " "
+        }
+    }
+}
+function areCardsTheSame(cards) {
+    if (cards[0] === cards[1]) {
         return true
     }
     return false
 }
-
-function renderDealerCards(){
-    dealersCardsEl.textContent = "Dealers Cards:"
-    for (let i = 0; i < dealerCards.length; i++){
-        dealersCardsEl.textContent += dealerCards[i] + "  "
-    }
-}
-
-function renderPlayerCards(){
-    playersCardsEl.textContent = "Your cards:"
-    for (let i = 0; i < playersCards.length; i++){
-        playersCardsEl.textContent += playersCards[i] + "  "
-    }
-}
-
-function dealCard(){
-    min = Math.ceil(2);
-    max = Math.floor(11);
-    let card = Math.floor(Math.random() * (max - min + 1) + min);
-    return card
-}
-
-function playerHits(){
-    hit(playersCards)
-    playersTotal = countCards(playersCards)
-    if (playersTotal>21){
-        alert("BUST")
-        hitButton.hidden=true
-        standButton.hidden=true        
-    }
-}
-
 // Hit: Ask for another card. You can ask for a hit until you decide to stand or else bust
-function hit(cards){
-    cards.push(dealCard())
+function hit() {
+    let currentHand = player.currentHand
+    player.hands[currentHand].addCard()
     renderPlayerCards()
+    let playerTotal = player.hands[currentHand].getCardTotal()
+    if (playerTotal >= BLACKJACK) {
+        player.standOrBustAHand()
+    }
     renderCorrectActionsToPlayer()
+    doesDealerPlay()
 }
 // Stand: Decide that you take no additional cards. The dealer can then play this hand
-function stand(){
-    hasSelectedStand = true
-    hitButton.hidden=true
-    standButton.hidden=true
-    dealerPlays()
+function stand() {
+    player.standOrBustAHand()
+    doesDealerPlay()
 }
 // Double Down: Double the amount of your bet + an extra card + stand
-function doubleDown(){
-    hit(playersCards)
+function doubleDown() {
+    //double money
+    hit()
     stand()
 }
 // Split: If you have two cards of the same value, you can split them into two separate hands. The bet is the same as the original bet so essentially doubling your bet.
-function splitCards(){
+function splitCards() {
     numberOfSplitCards += 1
     splitHandLogic()
 }
-
-function dealerPlays(){
-    renderDealerCards()
-    playersTotal = countCards(playersCards)
-    dealersTotal = countCards(dealerCards)
-    let dealerBustorStand = false
-    if (playersTotal>21){
+function doesDealerPlay() {
+    if (player.playerIsDone) {
+        hitButton.hidden = true
+        standButton.hidden = true
+        splitButton.hidden = true
+        doubleDownButton.hidden = true
+        dealerPlays()
+    }
+}
+function dealerPlays() {
+    //ERROR HERE CANT US CURRENT HAND BECAUSE IF YOU ARE HERE ITS CAUSE CURRENT HAND is +1 more than all hands
+    //player has, probably just check for each hand player has or ignore because no split fuctionality.
+    let playersTotal = player.hands[player.currentHand].getCardTotal()  
+    if (playersTotal > 21) {
         alert("dealer wins")
-    }
-    if (dealersTotal>21){
-        dealerBustorStand=true
-    }
-    if (dealersTotal<=16){
-        hit(dealerCards)
         return
-    }else if (dealersTotal>=18){
-        dealerBustorStand=true
     }
-    // If the dealer has a hard 17, he must stand
-    // If the dealer has a soft 17, the dealer must hit
-    if ((21-dealersTotal)<(21-playersTotal)){
-        alert("Dealer WINS")
-    }else{
-        alert("you win")
+    dealer.hands[0].addCard()
+    renderDealerCards()
+    while (!dealer.playerIsDone){
+        let dealersTotal = dealer.hands[0].getCardTotal()
+        if (dealersTotal <= 16) {
+            dealer.currentHand[0].addCard()
+            renderDealerCards()
+        } else if (dealersTotal >= 18) {
+            dealer.standOrBustAHand()
+        } else if(dealer.hands[0].cards.includes(11)){
+            // If the dealer has a hard 17, he must stand
+            // If the dealer has a soft 17, the dealer must hit
+            dealer.currentHand[0].addCard()
+            renderDealerCards()
+        } else{
+            dealer.standOrBustAHand()
+        }
+    }
+    let dealersTotal = dealer.hands[0].getCardTotal()
+    if(dealersTotal>21){
+        alert("YOU WIN")
+    }else if (dealersTotal===playersTotal){
+        alert("TIE")
+    }else if ((21 - dealersTotal) < (21 - playersTotal)) {
+        alert("DEALER WINS")
+    } else {
+        alert("YOU WIN!!!")
     }
 }
