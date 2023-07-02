@@ -19,6 +19,11 @@ function startGame() {
     renderCorrectActionsToPlayer()
 }
 
+function renderGame(){
+    //Render the correct things in the body for the game to work, this will reset the view 
+    //so the player can start a new round
+}
+
 function renderCorrectActionsToPlayer() {
     if(player.playerIsDone){
         return
@@ -85,27 +90,37 @@ function correctSVGToAdd(cardNumber, cardSuit){
     fileName+=".svg"
     return fileName
 }
-function renderDealerCards() {
-    dealersCardsEl.textContent = "Dealers Cards: "
-    for (let i = 0; i < dealer.hands[0].cards.length; i++) {
-        let cardNumber = dealer.hands[0].cards[i]
-        let cardSuit = dealer.hands[0].cardSuits[i]
+
+function renderCards(hand){
+    //This function will render the cards of the passed in player
+    innerHTMLToReturn = ''
+    for (let i = 0; i< hand.cards.length; i++){
+        let cardNumber = hand.cards[i]
+        let cardSuit = hand.cardSuits[i]
         fileName = correctSVGToAdd(cardNumber, cardSuit)
-        dealersCardsEl.innerHTML += "<img src = "+fileName+" alt="+fileName+"/>"
+        innerHTMLToReturn += `<img class = "card" src = "${fileName}" alt="${fileName}"/>`
     }
+    return innerHTMLToReturn
+}
+
+function renderDealerCards() {
+    dealersCardsEl.innerHTML = `
+        <div class="player-info">
+            <h2>Dealer</h2>
+            <p>Total: ${dealer.hands[0].getCardTotal()}</p>
+        </div>
+        ${renderCards(dealer.hands[0])}
+    `
 }
 
 function renderPlayerCards() {
-    playersCardsEl.textContent = "Your cards: "
-    for (let i = 0; i < player.hands.length; i++) {
-        playersCardsEl.textContent += "Hand " + (i + 1) + " - "
-        for (let j = 0; j < player.hands[i].cards.length; j++) {
-            let cardNumber = player.hands[i].cards[j]
-            let cardSuit = player.hands[i].cardSuits[j]
-            fileName = correctSVGToAdd(cardNumber, cardSuit)
-            playersCardsEl.innerHTML += "<img id=\"card\"src = "+fileName+" alt="+fileName+"/>"
-        }
-    }
+    playersCardsEl.innerHTML = `
+        <div class="player-info">
+            <h2>Player</h2>
+            <p>Total: ${player.hands[player.currentHand].getCardTotal()}</p>
+        </div>
+        ${renderCards(player.hands[player.currentHand])}
+    `
 }
 function areCardsTheSame(cards) {
     if (cards[0] === cards[1]) {

@@ -4,24 +4,26 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="blackjackstyle.css">
     <script src="classes.js"></script>
     <title>Javascript Blackjack</title>
 </head>
 <body>
-    <h1>Blackjack</h1>
-    <!-- Area at top of screen to keep track of chips -->
-    <!-- Area for dealers cards to appear -->
-    <p id = "dealerCards-el"></p>
-    <!-- Area for players cards to appear -->
-    <p id = "playerCards-el"></p>
-    <!-- Buttons for hit stand split ect -->
-    <div id="playerActions">
-        <button id="hitButton" onclick="hit()" hidden>Hit</button>
-        <button id="standButton" onclick="stand()" hidden>Stand</button>
-        <!-- <button id="splitButton" onclick="splitCards()" hidden>Split</button> -->
-        <button id="doubleDownButton" onclick="doubleDown()" hidden>Double Down</button>
-    </div>
-    <button id = "newHandButton" onclick="startGame()">Start New Hand</button>
-    <script src="index.js"></script>
+        <div id="blackjack-container">
+            <h1>Blackjack</h1>
+            <div id="game-info"></div>
+            <div id = "dealerCards-el"></div>
+            <div id = "playerCards-el"></div>
+            <div id="playerActions">
+                <button class = "actionButton" id="hitButton" onclick="hit()" hidden>Hit</button>
+                <button class = "actionButton" id="standButton" onclick="stand()" hidden>Stand</button>
+                <!-- <button class = "actionButton" id="splitButton" onclick="splitCards()" hidden>Split</button> -->
+                <button class = "actionButton" id="doubleDownButton" onclick="doubleDown()" hidden>Double Down</button>
+            </div>
+            <div id = "newHandButton-Container">
+                <button id = "newHandButton" onclick="startGame()">Start New Hand</button>
+            </div>
+        </div>
+<script src="index.js"></script>
 </body>
 </html>
